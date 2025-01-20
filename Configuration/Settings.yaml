@@ -1,0 +1,16 @@
+Flowpack:
+  SeoRouting:
+    redirect:
+      enable:
+        trailingSlash: true
+        toLowerCase: false
+      statusCode: 301
+    blocklist:
+      '/neos.*': true
+
+Neos:
+  Flow:
+    http:
+      middlewares:
+        'before routing':
+          middleware: 'Flowpack\SeoRouting\RoutingMiddleware'

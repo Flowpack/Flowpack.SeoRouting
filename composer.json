@@ -1,0 +1,40 @@
+{
+  "description": "Flow Framework Router to ensure a trailing slash in Neos.",
+  "type": "neos-package",
+  "license": "MIT",
+  "name": "flowpack/seo-routing",
+  "config": {
+    "bin-dir": "bin",
+    "allow-plugins": {
+      "neos/composer-plugin": true,
+      "phpstan/extension-installer": true
+    }
+  },
+  "require": {
+    "neos/flow": "^8.3",
+    "guzzlehttp/psr7": "^2.0",
+    "php": "^8.1"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2.1",
+    "phpstan/phpstan-phpunit": "^2.0",
+    "phpstan/extension-installer": "^1.4",
+    "phpstan/phpstan-strict-rules": "^2.0",
+    "phpunit/phpunit": "^11.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "Flowpack\\SeoRouting\\": "Classes/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Flowpack\\SeoRouting\\Tests\\": "Tests/"
+    }
+  },
+  "extra": {
+    "neos": {
+      "package-key": "Flowpack.SeoRouting"
+    }
+  }
+}
