@@ -12,5 +12,5 @@ Neos:
   Flow:
     http:
       middlewares:
-        'before routing':
+        'after routing':
           middleware: 'Flowpack\SeoRouting\RoutingMiddleware'
