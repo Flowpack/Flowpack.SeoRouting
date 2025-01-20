@@ -10,6 +10,7 @@
         * [Standard Configuration](#standard-configuration)
         * [Blocklist for redirects](#blocklist-for-redirects)
     * [Thank you](#thank-you)
+    * [Sponsoring](#sponsoring)
 
 <!-- TOC -->
 
@@ -76,3 +77,7 @@ Flowpack:
 This package originates from https://github.com/t3n/seo-routing.
 
 Thank you, T3N and associates for your work.
+
+## Sponsoring
+
+Thank you Biallo & Team GmbH for sponsoring the work from Sandstorm on this package.
