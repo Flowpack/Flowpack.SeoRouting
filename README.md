@@ -3,6 +3,7 @@
 <!-- TOC -->
 
 * [Flowpack.SeoRouting](#flowpackseorouting)
+    * [Sponsoring](#sponsoring)
     * [Introduction](#introduction)
     * [Features](#features)
     * [Installation](#installation)
@@ -10,9 +11,12 @@
         * [Standard Configuration](#standard-configuration)
         * [Blocklist for redirects](#blocklist-for-redirects)
     * [Thank you](#thank-you)
-    * [Sponsoring](#sponsoring)
 
 <!-- TOC -->
+
+## Sponsoring
+
+Thank you [Biallo & Team GmbH](https://www.biallo.de/) for sponsoring the work from Sandstorm on this package.
 
 ## Introduction
 
@@ -77,7 +81,3 @@ Flowpack:
 This package originates from https://github.com/t3n/seo-routing.
 
 Thank you, T3N and associates for your work.
-
-## Sponsoring
-
-Thank you Biallo & Team GmbH for sponsoring the work from Sandstorm on this package.
