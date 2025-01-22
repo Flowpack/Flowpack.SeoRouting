@@ -26,14 +26,15 @@ This package allows you to enforce a trailing slash and/or lower case urls in Fl
 
 This package has 2 main features:
 
-- **trailingSlash**: ensure that all links ends with a trailing slash (e.g. `example.com/test/` instead of
-  `example.com/test`)
+- **trailingSlash**: ensure that all rendered internal links in the frontend end with a trailing slash (e.g. `example.
+com/test/` instead of `example.com/test`) and all called URLs without trailing slash will be redirected to the same
+  page with a trailing slash
 - **toLowerCase**: ensure that camelCase links gets redirected to lowercase (e.g. `example.com/lowercase` instead of
   `example.com/lowerCase`)
 
 You can de- and activate both of them.
 
-Another small feature is to restrict all _new_ neos pages to have a lowercased `uriPathSegment`. This is done by
+Another small feature is to restrict all _new_ Neos pages to have a lowercased `uriPathSegment`. This is done by
 extending the `NodeTypes.Document.yaml`.
 
 ## Installation
@@ -50,8 +51,8 @@ In the standard configuration we have activated the trailingSlash (to redirect a
 with / at the end) and do all redirects with a 301 http status.
 
 *Note: The lowercase redirect is deactivated by default, because you have to make sure, that there is
-no `uriPathSegment`
-with camelCase or upperspace letters - this would lead to redirects in the neverland.*
+no Neos page with an `uriPathSegment` with camelCase or upperspace letters - this would lead to redirects in the
+neverland.*
 
 ```
 Flowpack:

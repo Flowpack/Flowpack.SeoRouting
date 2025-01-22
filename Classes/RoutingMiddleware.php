@@ -4,35 +4,38 @@ declare(strict_types=1);
 
 namespace Flowpack\SeoRouting;
 
+use Flowpack\SeoRouting\Helper\BlocklistHelper;
+use Flowpack\SeoRouting\Helper\ConfigurationHelper;
+use Flowpack\SeoRouting\Helper\LowerCaseHelper;
+use Flowpack\SeoRouting\Helper\TrailingSlashHelper;
 use Neos\Flow\Annotations as Flow;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\UriFactoryInterface;
-use Psr\Http\Message\UriInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-final class RoutingMiddleware implements MiddlewareInterface
+class RoutingMiddleware implements MiddlewareInterface
 {
     #[Flow\Inject]
     protected ResponseFactoryInterface $responseFactory;
 
     #[Flow\Inject]
-    protected UriFactoryInterface $uriFactory;
+    protected ConfigurationHelper $configurationHelper;
 
-    /** @var array{enable: array{trailingSlash: bool, toLowerCase: bool}, statusCode?: int} */
-    #[Flow\InjectConfiguration(path: 'redirect')]
-    protected array $configuration;
+    #[Flow\Inject]
+    protected BlocklistHelper $blocklistHelper;
 
-    /** @var array{string: bool} */
-    #[Flow\InjectConfiguration(path: 'blocklist')]
-    protected array $blocklist;
+    #[Flow\Inject]
+    protected TrailingSlashHelper $trailingSlashHelper;
+
+    #[Flow\Inject]
+    protected LowerCaseHelper $lowerCaseHelper;
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $isTrailingSlashEnabled = $this->configuration['enable']['trailingSlash'] ?? false;
-        $isToLowerCaseEnabled = $this->configuration['enable']['toLowerCase'] ?? false;
+        $isTrailingSlashEnabled = $this->configurationHelper->isTrailingSlashEnabled();
+        $isToLowerCaseEnabled = $this->configurationHelper->isToLowerCaseEnabled();
 
         $uri = $request->getUri();
 
@@ -40,72 +43,26 @@ final class RoutingMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        if ($this->matchesBlocklist($uri)) {
+        if ($this->blocklistHelper->isUriInBlocklist($uri)) {
             return $handler->handle($request);
         }
 
         $oldPath = $uri->getPath();
 
         if ($isTrailingSlashEnabled) {
-            $uri = $this->handleTrailingSlash($uri);
+            $uri = $this->trailingSlashHelper->appendTrailingSlash($uri);
         }
 
         if ($isToLowerCaseEnabled) {
-            $uri = $this->handleToLowerCase($uri);
+            $uri = $this->lowerCaseHelper->convertPathToLowerCase($uri);
         }
 
         if ($uri->getPath() === $oldPath) {
             return $handler->handle($request);
         }
 
-        $response = $this->responseFactory->createResponse($this->configuration['statusCode'] ?? 301);
+        $response = $this->responseFactory->createResponse($this->configurationHelper->getStatusCode());
 
         return $response->withAddedHeader('Location', (string)$uri);
-    }
-
-    private function handleTrailingSlash(UriInterface $uri): UriInterface
-    {
-        if (strlen($uri->getPath()) === 0) {
-            return $uri;
-        }
-
-        if (array_key_exists('extension', pathinfo($uri->getPath()))) {
-            return $uri;
-        }
-
-        return $uri->withPath(rtrim($uri->getPath(), '/') . '/')
-            ->withQuery($uri->getQuery())
-            ->withFragment($uri->getFragment());
-    }
-
-    private function handleToLowerCase(UriInterface $uri): UriInterface
-    {
-        $loweredPath = strtolower($uri->getPath());
-
-        if ($uri->getPath() === $loweredPath) {
-            return $uri;
-        }
-
-        $newUri = str_replace($uri->getPath(), $loweredPath, (string)$uri);
-
-        return $this->uriFactory->createUri($newUri);
-    }
-
-    private function matchesBlocklist(UriInterface $uri): bool
-    {
-        $path = $uri->getPath();
-        foreach ($this->blocklist as $rawPattern => $active) {
-            $pattern = '/' . str_replace('/', '\/', $rawPattern) . '/';
-
-            if (! $active) {
-                continue;
-            }
-
-            if (preg_match($pattern, $path) === 1) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
