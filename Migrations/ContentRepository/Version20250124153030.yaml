@@ -1,0 +1,16 @@
+up:
+  comments: 'Transforms all uriPathSegment values to lowercase'
+  warnings: 'As this migration removes the distinction between uppercase and lowercase it might not be cleanly undone by the down migration.'
+  migration:
+    - filters:
+        - type: 'NodeType'
+          settings:
+            nodeType: 'Neos.Neos:Document'
+            withSubTypes: TRUE
+      transformations:
+        - type: 'Flowpack\SeoRouting\Migration\Transformation\PropertyValueToLowercase'
+          settings:
+            property: 'uriPathSegment'
+
+down:
+  comments: 'No down migration available'

@@ -43,6 +43,12 @@ Just require it via composer:
 
 `composer require flowpack/seo-routing`
 
+If you want to use the *toLowerCase* feature you should execute the migration that comes with this package:
+
+`./flow node:migrate 20250124153030 --confirmation true`
+
+This migration transforms all the URLs of all your nodes to lowercase. It's irreversible.
+
 ## Configuration
 
 ### Standard Configuration
@@ -52,7 +58,8 @@ with / at the end) and do all redirects with a 301 http status.
 
 *Note: The lowercase redirect is deactivated by default, because you have to make sure, that there is
 no Neos page with an `uriPathSegment` with camelCase or upperspace letters - this would lead to redirects in the
-neverland.*
+neverland. You can achieve this by running the migration that ships with this package,
+see [installation](#installation).*
 
 ```
 Flowpack:
