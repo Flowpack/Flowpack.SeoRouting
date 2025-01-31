@@ -4,6 +4,7 @@ Flowpack:
       enable:
         trailingSlash: true
         toLowerCase: false
+      trailingSlashMode: 'add'
       statusCode: 301
     blocklist:
       '/neos.*': true

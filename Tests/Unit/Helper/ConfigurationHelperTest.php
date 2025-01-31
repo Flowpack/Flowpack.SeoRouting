@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Flowpack\SeoRouting\Tests\Unit\Helper;
 
+use Flowpack\SeoRouting\Enum\TrailingSlashModeEnum;
 use Flowpack\SeoRouting\Helper\ConfigurationHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -36,6 +37,20 @@ class ConfigurationHelperTest extends TestCase
         $this->injectConfiguration(['enable' => ['trailingSlash' => false, 'toLowerCase' => true]]);
 
         self::assertFalse($this->configurationHelper->isTrailingSlashEnabled());
+    }
+
+    public function testGetTrailingSlashModeShouldReturnGivenMode(): void
+    {
+        $this->injectConfiguration(['trailingSlashMode' => 'remove']);
+
+        self::assertSame(TrailingSlashModeEnum::REMOVE, $this->configurationHelper->getTrailingSlashMode());
+    }
+
+    public function testGetTrailingSlashModeShouldReturnDefaultMode(): void
+    {
+        $this->injectConfiguration(['trailingSlashMode' => 'foo']);
+
+        self::assertSame(TrailingSlashModeEnum::ADD, $this->configurationHelper->getTrailingSlashMode());
     }
 
     public function testIsToLowerCaseEnabledShouldReturnTrue(): void
@@ -76,7 +91,7 @@ class ConfigurationHelperTest extends TestCase
     }
 
     /**
-     * @param  array{enable: array{trailingSlash: bool, toLowerCase: bool}, statusCode?: int}|array{}  $configuration
+     * @param  array{enable?: array{trailingSlash: bool, toLowerCase: bool}, statusCode?: int, trailingSlashMode?: string}|array{}  $configuration
      */
     private function injectConfiguration(array $configuration): void
     {

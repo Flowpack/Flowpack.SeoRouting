@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Flowpack\SeoRouting\Tests\Unit;
 
+use Flowpack\SeoRouting\Enum\TrailingSlashModeEnum;
 use Flowpack\SeoRouting\Helper\BlocklistHelper;
 use Flowpack\SeoRouting\Helper\ConfigurationHelper;
 use Flowpack\SeoRouting\Helper\LowerCaseHelper;
@@ -78,7 +79,8 @@ class RoutingMiddlewareTest extends TestCase
         bool $isTrailingSlashEnabledResult,
         bool $isToLowerCaseEnabledResult,
         bool $isUriInBlocklistResult,
-        int $statusCode
+        int $statusCode,
+        TrailingSlashModeEnum $trailingSlashMode,
     ): void {
         $originalUri = new Uri($originalUrl);
         $expectedUri = new Uri($expectedUrl);
@@ -87,8 +89,10 @@ class RoutingMiddlewareTest extends TestCase
         $this->configurationHelperMock->method('isToLowerCaseEnabled')->willReturn($isToLowerCaseEnabledResult);
         $this->blocklistHelperMock->method('isUriInBlocklist')->willReturn($isUriInBlocklistResult);
         $this->trailingSlashHelperMock->method('appendTrailingSlash')->willReturn($expectedUri);
+        $this->trailingSlashHelperMock->method('removeTrailingSlash')->willReturn($expectedUri);
         $this->lowerCaseHelperMock->method('convertPathToLowerCase')->willReturn($expectedUri);
         $this->configurationHelperMock->method('getStatusCode')->willReturn($statusCode);
+        $this->configurationHelperMock->method('getTrailingSlashMode')->willReturn($trailingSlashMode);
 
         $this->requestMock->expects($this->once())->method('getUri')->willReturn($originalUri);
 
@@ -127,6 +131,7 @@ class RoutingMiddlewareTest extends TestCase
                 'isToLowerCaseEnabledResult' => false,
                 'isUriInBlocklistResult' => false,
                 'statusCode' => 301,
+                'trailingSlashMode' => TrailingSlashModeEnum::ADD,
             ],
             [
                 'originalUrl' => 'https://local.dev',
@@ -135,6 +140,7 @@ class RoutingMiddlewareTest extends TestCase
                 'isToLowerCaseEnabledResult' => false,
                 'isUriInBlocklistResult' => false,
                 'statusCode' => 302,
+                'trailingSlashMode' => TrailingSlashModeEnum::ADD,
             ],
             [
                 'originalUrl' => 'https://local.dev/test/test2',
@@ -143,6 +149,7 @@ class RoutingMiddlewareTest extends TestCase
                 'isToLowerCaseEnabledResult' => true,
                 'isUriInBlocklistResult' => true,
                 'statusCode' => 301,
+                'trailingSlashMode' => TrailingSlashModeEnum::ADD,
             ],
             [
                 'originalUrl' => 'https://local.dev/test/test2',
@@ -151,6 +158,16 @@ class RoutingMiddlewareTest extends TestCase
                 'isToLowerCaseEnabledResult' => true,
                 'isUriInBlocklistResult' => false,
                 'statusCode' => 301,
+                'trailingSlashMode' => TrailingSlashModeEnum::ADD,
+            ],
+            [
+                'originalUrl' => 'https://local.dev/test/test2/',
+                'expectedUrl' => 'https://local.dev/test/test2',
+                'isTrailingSlashEnabledResult' => true,
+                'isToLowerCaseEnabledResult' => false,
+                'isUriInBlocklistResult' => false,
+                'statusCode' => 301,
+                'trailingSlashMode' => TrailingSlashModeEnum::REMOVE,
             ],
         ];
     }

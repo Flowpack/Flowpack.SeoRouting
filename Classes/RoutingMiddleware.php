@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Flowpack\SeoRouting;
 
+use Flowpack\SeoRouting\Enum\TrailingSlashModeEnum;
 use Flowpack\SeoRouting\Helper\BlocklistHelper;
 use Flowpack\SeoRouting\Helper\ConfigurationHelper;
 use Flowpack\SeoRouting\Helper\LowerCaseHelper;
@@ -50,7 +51,10 @@ class RoutingMiddleware implements MiddlewareInterface
         $oldPath = $uri->getPath();
 
         if ($isTrailingSlashEnabled) {
-            $uri = $this->trailingSlashHelper->appendTrailingSlash($uri);
+            match ($this->configurationHelper->getTrailingSlashMode()) {
+                TrailingSlashModeEnum::ADD => $uri = $this->trailingSlashHelper->appendTrailingSlash($uri),
+                TrailingSlashModeEnum::REMOVE => $uri = $this->trailingSlashHelper->removeTrailingSlash($uri),
+            };
         }
 
         if ($isToLowerCaseEnabled) {

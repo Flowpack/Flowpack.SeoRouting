@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Flowpack\SeoRouting;
 
+use Flowpack\SeoRouting\Enum\TrailingSlashModeEnum;
 use Flowpack\SeoRouting\Helper\BlocklistHelper;
 use Flowpack\SeoRouting\Helper\ConfigurationHelper;
 use Flowpack\SeoRouting\Helper\TrailingSlashHelper;
@@ -26,10 +27,10 @@ class LinkingServiceAspect
     protected BlocklistHelper $blocklistHelper;
 
     /**
-     * This ensures that all internal links are rendered with a trailing slash.
+     * This ensures that all internal links are rendered with/without a trailing slash, depending on configuration.
      */
     #[Flow\Around('method(' . LinkingService::class . '->createNodeUri())')]
-    public function appendTrailingSlashToNodeUri(JoinPointInterface $joinPoint): string
+    public function handleTrailingSlashForNodeUri(JoinPointInterface $joinPoint): string
     {
         /** @var string $result */
         $result = $joinPoint->getAdviceChain()->proceed($joinPoint);
@@ -48,6 +49,10 @@ class LinkingServiceAspect
             return $result;
         }
 
-        return (string)$this->trailingSlashHelper->appendTrailingSlash($uri);
+        if ($this->configurationHelper->getTrailingSlashMode() === TrailingSlashModeEnum::ADD) {
+            return (string)$this->trailingSlashHelper->appendTrailingSlash($uri);
+        }
+
+        return (string)$this->trailingSlashHelper->removeTrailingSlash($uri);
     }
 }

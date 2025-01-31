@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Flowpack\SeoRouting\Tests\Unit;
 
+use Flowpack\SeoRouting\Enum\TrailingSlashModeEnum;
 use Flowpack\SeoRouting\Helper\BlocklistHelper;
 use Flowpack\SeoRouting\Helper\ConfigurationHelper;
 use Flowpack\SeoRouting\Helper\TrailingSlashHelper;
@@ -61,7 +62,7 @@ class LinkingServiceAspectTest extends TestCase
 
         assertSame(
             $result,
-            $this->linkingServiceAspect->appendTrailingSlashToNodeUri($this->joinPointMock)
+            $this->linkingServiceAspect->handleTrailingSlashForNodeUri($this->joinPointMock)
         );
     }
 
@@ -74,7 +75,7 @@ class LinkingServiceAspectTest extends TestCase
 
         assertSame(
             $result,
-            $this->linkingServiceAspect->appendTrailingSlashToNodeUri($this->joinPointMock)
+            $this->linkingServiceAspect->handleTrailingSlashForNodeUri($this->joinPointMock)
         );
     }
 
@@ -89,16 +90,19 @@ class LinkingServiceAspectTest extends TestCase
 
         assertSame(
             $result,
-            $this->linkingServiceAspect->appendTrailingSlashToNodeUri($this->joinPointMock)
+            $this->linkingServiceAspect->handleTrailingSlashForNodeUri($this->joinPointMock)
         );
     }
 
-    public function testAppendTrailingSlashToNodeUriShouldChangeResult(): void
+    public function testAppendTrailingSlashToNodeUriShouldAppendTrailingSlash(): void
     {
         $result = 'foo/';
         $this->adviceChainMock->expects($this->once())->method('proceed')->willReturn('foo');
 
         $this->configurationHelperMock->expects($this->once())->method('isTrailingSlashEnabled')->willReturn(true);
+        $this->configurationHelperMock->expects($this->once())->method('getTrailingSlashMode')->willReturn(
+            TrailingSlashModeEnum::ADD
+        );
         $this->blocklistHelperMock->expects($this->once())->method('isUriInBlocklist')->willReturn(false);
         $this->trailingSlashHelperMock->expects($this->once())->method('appendTrailingSlash')->willReturn(
             new Uri($result)
@@ -106,7 +110,27 @@ class LinkingServiceAspectTest extends TestCase
 
         assertSame(
             $result,
-            $this->linkingServiceAspect->appendTrailingSlashToNodeUri($this->joinPointMock)
+            $this->linkingServiceAspect->handleTrailingSlashForNodeUri($this->joinPointMock)
+        );
+    }
+
+    public function testAppendTrailingSlashToNodeUriShouldRemoveTrailingSlash(): void
+    {
+        $result = 'foo/';
+        $this->adviceChainMock->expects($this->once())->method('proceed')->willReturn('foo');
+
+        $this->configurationHelperMock->expects($this->once())->method('isTrailingSlashEnabled')->willReturn(true);
+        $this->configurationHelperMock->expects($this->once())->method('getTrailingSlashMode')->willReturn(
+            TrailingSlashModeEnum::REMOVE
+        );
+        $this->blocklistHelperMock->expects($this->once())->method('isUriInBlocklist')->willReturn(false);
+        $this->trailingSlashHelperMock->expects($this->once())->method('removeTrailingSlash')->willReturn(
+            new Uri($result)
+        );
+
+        assertSame(
+            $result,
+            $this->linkingServiceAspect->handleTrailingSlashForNodeUri($this->joinPointMock)
         );
     }
 }
