@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Flowpack\SeoRouting\Helper;
 
+use Flowpack\SeoRouting\Enum\TrailingSlashModeEnum;
 use Neos\Flow\Annotations as Flow;
 
 #[Flow\Scope('singleton')]
 class ConfigurationHelper
 {
-    /** @var array{enable: array{trailingSlash: bool, toLowerCase: bool}, statusCode?: int} */
+    /** @var array{enable: array{trailingSlash: bool, toLowerCase: bool}, statusCode?: int, trailingSlashMode: string} */
     #[Flow\InjectConfiguration(path: 'redirect')]
     protected array $configuration;
 
@@ -20,6 +21,11 @@ class ConfigurationHelper
     public function isTrailingSlashEnabled(): bool
     {
         return $this->configuration['enable']['trailingSlash'] ?? false;
+    }
+
+    public function getTrailingSlashMode(): TrailingSlashModeEnum
+    {
+        return TrailingSlashModeEnum::tryFrom($this->configuration['trailingSlashMode']) ?? TrailingSlashModeEnum::ADD;
     }
 
     public function isToLowerCaseEnabled(): bool

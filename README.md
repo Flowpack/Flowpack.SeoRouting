@@ -9,6 +9,7 @@
     * [Installation](#installation)
     * [Configuration](#configuration)
         * [Standard Configuration](#standard-configuration)
+        * [Trailing slash mode](#trailing-slash-mode)
         * [Blocklist for redirects](#blocklist-for-redirects)
     * [Thank you](#thank-you)
 
@@ -20,15 +21,15 @@ Thank you [Biallo & Team GmbH](https://www.biallo.de/) for sponsoring the work f
 
 ## Introduction
 
-This package allows you to enforce a trailing slash and/or lower case urls in Flow/Neos.
+This package allows you to enforce a trailing slash or enforce no trailing slash and/or lower case urls in Flow/Neos.
 
 ## Features
 
-This package has 2 main features:
+Main features:
 
 - **trailingSlash**: ensure that all rendered internal links in the frontend end with a trailing slash (e.g. `example.
 com/test/` instead of `example.com/test`) and all called URLs without trailing slash will be redirected to the same
-  page with a trailing slash
+  page with a trailing slash or the opposite (e.g. `example.com/test` instead of `example.com/test/`)
 - **toLowerCase**: ensure that camelCase links gets redirected to lowercase (e.g. `example.com/lowercase` instead of
   `example.com/lowerCase`)
 
@@ -68,10 +69,18 @@ Flowpack:
       enable:
         trailingSlash: true
         toLowerCase: false
+      trailingSlashMode: 'add'  
       statusCode: 301
     blocklist:
       '/neos.*': true
 ```
+
+### Trailing slash mode
+
+You can set the `trailingSlashMode` to `add` or `remove`. For this setting to have an effect you have to set
+`trailingSlash` to true.
+
+This effects redirects and all rendered internal urls.
 
 ### Blocklist for redirects
 
