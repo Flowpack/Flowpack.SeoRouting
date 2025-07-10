@@ -7,7 +7,8 @@ namespace Flowpack\SeoRouting\Migration\Transformation;
 use Neos\ContentRepository\Domain\Model\NodeData;
 use Neos\ContentRepository\Migration\Transformations\AbstractTransformation;
 
-class PropertyValueToLowercase extends AbstractTransformation
+// TODO 9.0 migration: You need to convert your AbstractTransformation to an implementation of Neos\ContentRepository\NodeMigration\Transformation\TransformationFactoryInterface
+class PropertyValueToLowercase
 {
     private string $propertyName;
 
