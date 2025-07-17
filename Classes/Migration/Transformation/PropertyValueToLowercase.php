@@ -4,39 +4,58 @@ declare(strict_types=1);
 
 namespace Flowpack\SeoRouting\Migration\Transformation;
 
-use Neos\ContentRepository\Domain\Model\NodeData;
-use Neos\ContentRepository\Migration\Transformations\AbstractTransformation;
+use Neos\ContentRepository\Core\DimensionSpace\DimensionSpacePoint;
+use Neos\ContentRepository\Core\Projection\ContentGraph\Node;
+use Neos\ContentRepository\Core\SharedModel\Workspace\WorkspaceName;
+use Neos\ContentRepository\NodeMigration\Transformation\NodeBasedTransformationInterface;
+use Neos\ContentRepository\Core\ContentRepository;
+use Neos\ContentRepository\Core\Feature\NodeModification\Command\SetNodeProperties;
+use Neos\ContentRepository\Core\Feature\NodeModification\Dto\PropertyValuesToWrite;
+use Neos\ContentRepository\NodeMigration\Transformation\GlobalTransformationInterface;
+use Neos\ContentRepository\NodeMigration\Transformation\TransformationFactoryInterface;
+use Neos\ContentRepository\NodeMigration\Transformation\TransformationStep;
 
-// TODO 9.0 migration: You need to convert your AbstractTransformation to an implementation of Neos\ContentRepository\NodeMigration\Transformation\TransformationFactoryInterface
-class PropertyValueToLowercase
+/**
+ * Transforms a specified property value of a node to lowercase.
+ */
+class PropertyValueToLowercase implements TransformationFactoryInterface
 {
-    private string $propertyName;
-
-    public function setProperty(string $propertyName): void
-    {
-        $this->propertyName = $propertyName;
-    }
-
     /**
-     * @inheritDoc
+     * @param array<string,string> $settings
      */
-    public function isTransformable(NodeData $node)
+    public function build(array $settings, ContentRepository $contentRepository): GlobalTransformationInterface|NodeBasedTransformationInterface
     {
-        return $node->hasProperty($this->propertyName);
-    }
+        return new class(
+            $settings['property']
+        ) implements NodeBasedTransformationInterface {
 
-    /**
-     * @inheritDoc
-     */
-    public function execute(NodeData $node)
-    {
-        $currentPropertyValue = $node->getProperty($this->propertyName);
-        if (! is_string($currentPropertyValue)) {
-            return $node;
-        }
-        $newPropertyValue = strtolower($currentPropertyValue);
-        $node->setProperty($this->propertyName, $newPropertyValue);
+            private string $propertyName;
 
-        return $node;
+            public function __construct(string $propertyName)
+            {
+                $this->propertyName = $propertyName;
+            }
+
+            public function execute(Node $node, DimensionSpacePoint $coveredDimensionSpacePoints, WorkspaceName $workspaceNameForWriting): TransformationStep
+            {
+                $currentProperty = $node->getProperty($this->propertyName);
+
+                if ($currentProperty !== null && is_string($currentProperty)) {
+                    $value = strtolower($currentProperty);
+                    return TransformationStep::fromCommand(
+                        SetNodeProperties::create(
+                            $workspaceNameForWriting,
+                            $node->aggregateId,
+                            $node->originDimensionSpacePoint,
+                            PropertyValuesToWrite::fromArray([
+                                $this->propertyName => $value,
+                            ])
+                        )
+                    );
+                }
+
+                return TransformationStep::createEmpty();
+            }
+        };
     }
 }

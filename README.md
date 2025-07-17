@@ -50,7 +50,7 @@ composer require flowpack/seo-routing
 If you want to use the *toLowerCase* feature you should execute the migration that comes with this package:
 
 ```
-./flow node:migrate 20250124153030 --confirmation true
+./flow nodemigration:execute 20250124153030 --force
 ```
 
 > [!WARNING]  
