@@ -6,8 +6,7 @@ migration:
         settings:
           nodeType: "Neos.Neos:Document"
           withSubTypes: TRUE
-    # Custom transformation not possible in Neos < 9.0: https://neos-project.slack.com/archives/C04V4C6B0/p1752678184783919
-    # transformations:
-    #   - type: 'Flowpack\SeoRouting\Migration\Transformation\PropertyValueToLowercase'
-    #     settings:
-    #       property: "uriPathSegment"
+    transformations:
+      - type: 'PropertyValueToLowercase'
+        settings:
+          property: "uriPathSegment"
