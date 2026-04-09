@@ -1,18 +1,17 @@
 # Flowpack.SeoRouting
 
 <!-- TOC -->
-
 * [Flowpack.SeoRouting](#flowpackseorouting)
-    * [Sponsoring](#sponsoring)
-    * [Introduction](#introduction)
-    * [Features](#features)
-    * [Installation](#installation)
-    * [Configuration](#configuration)
-        * [Standard Configuration](#standard-configuration)
-        * [Trailing slash mode](#trailing-slash-mode)
-        * [Blocklist for redirects](#blocklist-for-redirects)
-    * [Thank you](#thank-you)
-
+  * [Sponsoring](#sponsoring)
+  * [Introduction](#introduction)
+  * [Features](#features)
+  * [Installation](#installation)
+  * [Optional steps](#optional-steps)
+  * [Configuration](#configuration)
+    * [Standard Configuration](#standard-configuration)
+    * [Trailing slash mode](#trailing-slash-mode)
+    * [Blocklist for redirects](#blocklist-for-redirects)
+  * [Thank you](#thank-you)
 <!-- TOC -->
 
 ## Sponsoring
@@ -44,11 +43,17 @@ Just require it via composer:
 
 `composer require flowpack/seo-routing`
 
+## Optional steps
+
 If you want to use the *toLowerCase* feature you should execute the migration that comes with this package:
 
 `./flow node:migrate 20250124153030 --confirmation true`
 
-This migration transforms all the URLs of all your nodes to lowercase. It's irreversible.
+> [!WARNING]  
+> This migration transforms all the URLs of all your nodes to lowercase. It's irreversible.
+
+> [!IMPORTANT]  
+> The migration doesn't work for Neos 9 right now, see https://github.com/Flowpack/Flowpack.SeoRouting/pull/10
 
 ## Configuration
 
