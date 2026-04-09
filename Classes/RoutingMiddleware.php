@@ -65,8 +65,13 @@ class RoutingMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $response = $this->responseFactory->createResponse($this->configurationHelper->getStatusCode());
+        $response = $handler->handle($request);
 
-        return $response->withAddedHeader('Location', (string)$uri);
+        if ($response->getStatusCode() >= 400) {
+            return $response;
+        }
+
+        return $this->responseFactory->createResponse($this->configurationHelper->getStatusCode())
+            ->withAddedHeader('Location', (string)$uri);
     }
 }
