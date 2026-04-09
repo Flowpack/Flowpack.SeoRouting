@@ -25,7 +25,12 @@ class TrailingSlashHelper
             return $uri;
         }
 
-        return $uri->withPath(rtrim($uri->getPath(), '/'));
+        $path = $uri->getPath();
+        if ($path === '/') {
+            return $uri;
+        }
+
+        return $uri->withPath(rtrim($path, '/'));
     }
 
     private function shouldUriByHandled(UriInterface $uri): bool
