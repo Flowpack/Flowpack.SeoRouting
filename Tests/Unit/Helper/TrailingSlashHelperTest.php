@@ -63,7 +63,7 @@ class TrailingSlashHelperTest extends TestCase
     {
         return [
             ['', ''],
-            ['/', ''],
+            ['/', '/'],
             ['/foo/', '/foo'],
             ['/foo/bar/', '/foo/bar'],
             ['https://test.de', 'https://test.de'],
