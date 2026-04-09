@@ -81,6 +81,7 @@ class RoutingMiddlewareTest extends TestCase
         bool $isUriInBlocklistResult,
         int $statusCode,
         TrailingSlashModeEnum $trailingSlashMode,
+        int $handlerStatusCode = 200,
     ): void {
         $originalUri = new Uri($originalUrl);
         $expectedUri = new Uri($expectedUrl);
@@ -96,9 +97,19 @@ class RoutingMiddlewareTest extends TestCase
 
         $this->requestMock->expects($this->once())->method('getUri')->willReturn($originalUri);
 
-        if ($originalUrl === $expectedUrl) {
+        $pathChanged = $originalUrl !== $expectedUrl;
+
+        if (!$pathChanged) {
             $this->requestHandlerMock->method('handle')->willReturn($this->responseMock);
+        } elseif ($handlerStatusCode >= 400) {
+            $this->responseMock->method('getStatusCode')->willReturn($handlerStatusCode);
+            $this->requestHandlerMock->method('handle')->willReturn($this->responseMock);
+            $this->responseFactoryMock->expects($this->never())->method('createResponse');
         } else {
+            $handlerResponseMock = $this->createMock(ResponseInterface::class);
+            $handlerResponseMock->method('getStatusCode')->willReturn($handlerStatusCode);
+            $this->requestHandlerMock->method('handle')->willReturn($handlerResponseMock);
+
             $this->responseFactoryMock
                 ->expects($this->once())
                 ->method('createResponse')
@@ -168,6 +179,16 @@ class RoutingMiddlewareTest extends TestCase
                 'isUriInBlocklistResult' => false,
                 'statusCode' => 301,
                 'trailingSlashMode' => TrailingSlashModeEnum::REMOVE,
+            ],
+            [
+                'originalUrl' => 'https://local.dev/missing',
+                'expectedUrl' => 'https://local.dev/missing/',
+                'isTrailingSlashEnabledResult' => true,
+                'isToLowerCaseEnabledResult' => false,
+                'isUriInBlocklistResult' => false,
+                'statusCode' => 301,
+                'trailingSlashMode' => TrailingSlashModeEnum::ADD,
+                'handlerStatusCode' => 404,
             ],
         ];
     }
