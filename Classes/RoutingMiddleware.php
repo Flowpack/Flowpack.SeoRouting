@@ -80,7 +80,7 @@ class RoutingMiddleware implements MiddlewareInterface
             throw $exception;
         }
 
-        return $this->responseFactory->createResponse(statusCode)
+        return $this->responseFactory->createResponse($statusCode)
             ->withAddedHeader('Location', (string)$uri);
     }
 }
