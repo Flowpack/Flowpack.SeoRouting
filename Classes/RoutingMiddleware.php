@@ -7,6 +7,7 @@ namespace Flowpack\SeoRouting;
 use Flowpack\SeoRouting\Enum\TrailingSlashModeEnum;
 use Flowpack\SeoRouting\Helper\BlocklistHelper;
 use Flowpack\SeoRouting\Helper\ConfigurationHelper;
+use Flowpack\SeoRouting\Helper\ExceptionHelper;
 use Flowpack\SeoRouting\Helper\LowerCaseHelper;
 use Flowpack\SeoRouting\Helper\TrailingSlashHelper;
 use Neos\Flow\Annotations as Flow;
@@ -71,7 +72,15 @@ class RoutingMiddleware implements MiddlewareInterface
             return $response;
         }
 
-        return $this->responseFactory->createResponse($this->configurationHelper->getStatusCode())
+        $statusCode = $this->configurationHelper->getStatusCode();
+
+        if ($statusCode >= 400) {
+            $exception = new ExceptionHelper();
+            $exception->setStatusCode($statusCode);
+            throw $exception;
+        }
+
+        return $this->responseFactory->createResponse(statusCode)
             ->withAddedHeader('Location', (string)$uri);
     }
 }
