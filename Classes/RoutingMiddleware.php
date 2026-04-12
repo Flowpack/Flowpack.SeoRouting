@@ -62,13 +62,9 @@ class RoutingMiddleware implements MiddlewareInterface
             $uri = $this->lowerCaseHelper->convertPathToLowerCase($uri);
         }
 
-        if ($uri->getPath() === $oldPath) {
-            return $handler->handle($request);
-        }
-
         $response = $handler->handle($request);
-
-        if ($response->getStatusCode() >= 400) {
+ 
+        if ($uri->getPath() === $oldPath || $response->getStatusCode() >= 400) {
             return $response;
         }
 
