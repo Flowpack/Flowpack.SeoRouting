@@ -22,6 +22,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use ReflectionClass;
+use Throwable;
 
 #[CoversClass(RoutingMiddleware::class)]
 #[CoversClass(HttpException::class)]
@@ -74,6 +75,11 @@ class RoutingMiddlewareTest extends TestCase
     }
 
 
+    /**
+     * @param class-string<Throwable>|null $expectedException
+     * @throws Exception
+     * @throws HttpException
+     */
     #[DataProvider('urlsDataProvider')]
     public function testProcessShouldHandleUrlsCorrectly(
         string $originalUrl,
