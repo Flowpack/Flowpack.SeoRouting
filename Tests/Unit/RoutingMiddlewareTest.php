@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Flowpack\SeoRouting\Tests\Unit;
 
 use Flowpack\SeoRouting\Enum\TrailingSlashModeEnum;
+use Flowpack\SeoRouting\Exceptions\Http\Exception as HttpException;
 use Flowpack\SeoRouting\Helper\BlocklistHelper;
 use Flowpack\SeoRouting\Helper\ConfigurationHelper;
 use Flowpack\SeoRouting\Helper\LowerCaseHelper;
@@ -21,8 +22,10 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use ReflectionClass;
+use Throwable;
 
 #[CoversClass(RoutingMiddleware::class)]
+#[CoversClass(HttpException::class)]
 class RoutingMiddlewareTest extends TestCase
 {
     private readonly RoutingMiddleware $routingMiddleware;
@@ -72,6 +75,11 @@ class RoutingMiddlewareTest extends TestCase
     }
 
 
+    /**
+     * @param class-string<Throwable>|null $expectedException
+     * @throws Exception
+     * @throws HttpException
+     */
     #[DataProvider('urlsDataProvider')]
     public function testProcessShouldHandleUrlsCorrectly(
         string $originalUrl,
@@ -82,6 +90,7 @@ class RoutingMiddlewareTest extends TestCase
         int $statusCode,
         TrailingSlashModeEnum $trailingSlashMode,
         int $handlerStatusCode = 200,
+        ?string $expectedException = null,
     ): void {
         $originalUri = new Uri($originalUrl);
         $expectedUri = new Uri($expectedUrl);
@@ -98,8 +107,12 @@ class RoutingMiddlewareTest extends TestCase
         $this->requestMock->expects($this->once())->method('getUri')->willReturn($originalUri);
 
         $pathChanged = $originalUrl !== $expectedUrl;
-
-        if (!$pathChanged) {
+        if (is_string($expectedException)) {
+            $this->expectException($expectedException);
+            $this->responseFactoryMock->expects($this->never())->method('createResponse');
+            $this->routingMiddleware->process($this->requestMock, $this->requestHandlerMock);
+            return;
+        } elseif (!$pathChanged) {
             $this->requestHandlerMock->method('handle')->willReturn($this->responseMock);
         } elseif ($handlerStatusCode >= 400) {
             $this->responseMock->method('getStatusCode')->willReturn($handlerStatusCode);
@@ -122,7 +135,6 @@ class RoutingMiddlewareTest extends TestCase
                 ->with('Location', (string)$expectedUri)
                 ->willReturnSelf();
         }
-
         self::assertSame(
             $this->responseMock,
             $this->routingMiddleware->process($this->requestMock, $this->requestHandlerMock)
@@ -189,6 +201,16 @@ class RoutingMiddlewareTest extends TestCase
                 'statusCode' => 301,
                 'trailingSlashMode' => TrailingSlashModeEnum::ADD,
                 'handlerStatusCode' => 404,
+            ],
+            [
+                'originalUrl' => 'https://local.dev',
+                'expectedUrl' => 'https://local.dev/',
+                'isTrailingSlashEnabledResult' => true,
+                'isToLowerCaseEnabledResult' => false,
+                'isUriInBlocklistResult' => false,
+                'statusCode' => 404,
+                'trailingSlashMode' => TrailingSlashModeEnum::ADD,
+                'expectedException' => HttpException::class
             ],
         ];
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Flowpack\SeoRouting;
 
 use Flowpack\SeoRouting\Enum\TrailingSlashModeEnum;
+use Flowpack\SeoRouting\Exceptions\Http\Exception as HttpException;
 use Flowpack\SeoRouting\Helper\BlocklistHelper;
 use Flowpack\SeoRouting\Helper\ConfigurationHelper;
 use Flowpack\SeoRouting\Helper\LowerCaseHelper;
@@ -33,6 +34,9 @@ class RoutingMiddleware implements MiddlewareInterface
     #[Flow\Inject]
     protected LowerCaseHelper $lowerCaseHelper;
 
+    /**
+     * @throws HttpException
+     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $isTrailingSlashEnabled = $this->configurationHelper->isTrailingSlashEnabled();
@@ -61,17 +65,19 @@ class RoutingMiddleware implements MiddlewareInterface
             $uri = $this->lowerCaseHelper->convertPathToLowerCase($uri);
         }
 
-        if ($uri->getPath() === $oldPath) {
-            return $handler->handle($request);
-        }
-
         $response = $handler->handle($request);
-
-        if ($response->getStatusCode() >= 400) {
+ 
+        if ($uri->getPath() === $oldPath || $response->getStatusCode() >= 400) {
             return $response;
         }
 
-        return $this->responseFactory->createResponse($this->configurationHelper->getStatusCode())
+        $statusCode = $this->configurationHelper->getStatusCode();
+
+        if ($statusCode >= 400) {
+            throw new HttpException($statusCode);
+        }
+
+        return $this->responseFactory->createResponse($statusCode)
             ->withAddedHeader('Location', (string)$uri);
     }
 }
