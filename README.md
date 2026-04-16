@@ -41,13 +41,17 @@ extending the `NodeTypes.Document.yaml`.
 
 Just require it via composer:
 
-`composer require flowpack/seo-routing`
+```
+composer require flowpack/seo-routing
+```
 
 ## Optional steps
 
 If you want to use the *toLowerCase* feature you should execute the migration that comes with this package:
 
-`./flow node:migrate 20250124153030 --confirmation true`
+```
+./flow node:migrate 20250124153030 --confirmation true
+```
 
 > [!WARNING]  
 > This migration transforms all the URLs of all your nodes to lowercase. It's irreversible.
