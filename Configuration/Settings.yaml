@@ -15,3 +15,8 @@ Neos:
       middlewares:
         'after routing':
           middleware: 'Flowpack\SeoRouting\RoutingMiddleware'
+
+  ContentRepositoryRegistry:
+    nodeMigration:
+      transformationFactories:
+        PropertyValueToLowercase: Flowpack\SeoRouting\Migration\Transformation\PropertyValueToLowercase
