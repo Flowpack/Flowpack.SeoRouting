@@ -19,7 +19,7 @@
   },
   "require-dev": {
     "neos/neos": "^9.0",
-    "neos/contentrepositoryregistry-doctrinedbalclient": "*",
+    "neos/contentrepositoryregistry-doctrinedbalclient": "^9.0@beta",
     "phpstan/phpstan": "^2.1",
     "phpstan/phpstan-phpunit": "^2.0",
     "phpstan/extension-installer": "^1.4",
