@@ -56,9 +56,6 @@ If you want to use the *toLowerCase* feature you should execute the migration th
 > [!WARNING]  
 > This migration transforms all the URLs of all your nodes to lowercase. It's irreversible.
 
-> [!IMPORTANT]  
-> The migration doesn't work for Neos 9 right now, see https://github.com/Flowpack/Flowpack.SeoRouting/pull/10
-
 ## Configuration
 
 ### Standard Configuration
